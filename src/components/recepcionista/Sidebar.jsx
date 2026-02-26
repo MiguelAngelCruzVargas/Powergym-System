@@ -2,9 +2,12 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+import AuthContext from '../../context/AuthContext';
+
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = React.useContext(AuthContext);
 
   const menuItems = [
     {
@@ -56,8 +59,44 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       )
-    }
+    },
   ];
+
+  // si es admin, agregar enlaces rápidos
+  if (user && user.role === 'admin') {
+    // acceso al formulario de registro público
+    menuItems.push({
+      id: 'registro',
+      name: 'Registrar Miembro',
+      path: '/recepcion/registro',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      )
+    });
+    // enlaces a otras secciones para administración global
+    menuItems.push({
+      id: 'coach-panel',
+      name: 'Panel Coach',
+      path: '/coach/dashboard',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7m-9 4v6m4-6v6" />
+        </svg>
+      )
+    });
+    menuItems.push({
+      id: 'cliente-panel',
+      name: 'Panel Miembro',
+      path: '/cliente/dashboard',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A4 4 0 018 15h8a4 4 0 012.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z" />
+        </svg>
+      )
+    });
+  }
 
   const handleLogout = () => {
     // Aquí iría la lógica de cerrar sesión

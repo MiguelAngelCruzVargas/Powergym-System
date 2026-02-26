@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -18,22 +20,37 @@ const Login = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const { login } = React.useContext(AuthContext);
+const navigate = useNavigate();
+
+const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!formData.email || !formData.password) {
       setError('Por favor completa todos los campos');
       return;
     }
 
     setIsLoading(true);
-    
-    // Simulación de login (aquí iría tu llamada al backend)
-    setTimeout(() => {
+    try {
+      const user = await login(formData.email, formData.password);
+      // redirigir según rol
+      if (user.role === 'admin') {
+        // admin uses reception panel by default
+        navigate('/recepcion');
+      } else if (user.role === 'coach') {
+        navigate('/coach');
+      } else if (user.role === 'recepcionista') {
+        navigate('/recepcion');
+      } else if (user.role === 'miembro') {
+        navigate('/cliente');
+      } else {
+        navigate('/');
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsLoading(false);
-      // Aquí manejarías la respuesta del backend
-      console.log('Login exitoso', formData);
-    }, 1500);
+    }
   };
 
   return (

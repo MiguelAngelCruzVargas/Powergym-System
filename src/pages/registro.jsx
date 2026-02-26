@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 
 const Registro = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [memberId, setMemberId] = useState('');
+
+  // detect if estamos dentro del panel de recepcion (admin/recepcionista)
+  const inPanel = user && location.pathname.startsWith('/recepcion');
 
   // Estado para formulario de cliente
   const [formCliente, setFormCliente] = useState({
@@ -76,35 +82,42 @@ const Registro = () => {
     }
 
     setIsLoading(true);
-    
-    // Simulación de registro (aquí iría tu llamada al backend)
-    setTimeout(() => {
-      setIsLoading(false);
-      // Generar ID del miembro
-      const nuevoId = generarMemberId();
-      setMemberId(nuevoId);
-      
-      // Aquí guardarías los datos en tu backend incluyendo el ID generado
-      console.log('Cliente registrado:', {
-        ...formCliente,
-        memberId: nuevoId
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formCliente)
       });
-      
-      // Mostrar modal con el ID
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Hubo un error');
+      setMemberId(data.memberId);
       setShowModal(true);
-    }, 1500);
+    } catch (err) {
+      setMensaje(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCerrarModal = () => {
     setShowModal(false);
-    // Redirigir al login después de cerrar el modal
+    // Si no hay usuario (registro público) enviamos a login,
+    // si hay usuario (admin en panel) volvemos al panel de recepcion
     setTimeout(() => {
-      navigate('/login');
+      if (user) {
+        navigate('/recepcion');
+      } else {
+        navigate('/login');
+      }
     }, 300);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div className={
+        inPanel
+          ? "w-full h-full flex items-center justify-center py-12"
+          : "min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4 py-12"
+      }>
       {/* Logo flotante en la esquina superior izquierda */}
       <motion.div
         initial={{ x: -50, opacity: 0 }}
@@ -134,12 +147,12 @@ const Registro = () => {
       </motion.div>
 
       {/* Contenido Principal */}
-      <div className="flex items-center justify-center min-h-screen px-4 py-12">
+      <div className={inPanel ? "flex items-center justify-center w-full h-full" : "flex items-center justify-center min-h-screen px-4 py-12"}>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full max-w-2xl"
+          className={inPanel ? "w-full" : "w-full max-w-2xl"}
         >
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 shadow-2xl">
             {/* Encabezado */}
@@ -396,19 +409,21 @@ const Registro = () => {
                 )}
               </motion.button>
 
-              {/* Link a Login */}
-              <div className="text-center pt-4">
-                <p className="text-sm text-gray-400">
-                  ¿Ya tienes una cuenta?{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('/login')}
-                    className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
-                  >
-                    Inicia sesión aquí
-                  </button>
-                </p>
-              </div>
+              {/* Link a Login - sólo si no hay usuario autenticado (admin en panel no lo ve) */}
+              {!user && (
+                <div className="text-center pt-4">
+                  <p className="text-sm text-gray-400">
+                    ¿Ya tienes una cuenta?{' '}
+                    <button
+                      type="button"
+                      onClick={() => navigate('/login')}
+                      className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
+                    >
+                      Inicia sesión aquí
+                    </button>
+                  </p>
+                </div>
+              )}
             </form>
           </div>
         </motion.div>
@@ -517,7 +532,7 @@ const Registro = () => {
                 onClick={handleCerrarModal}
                 className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
               >
-                Ir a Iniciar Sesión
+                {user ? 'Aceptar' : 'Ir a Iniciar Sesión'}
               </motion.button>
             </motion.div>
           </motion.div>

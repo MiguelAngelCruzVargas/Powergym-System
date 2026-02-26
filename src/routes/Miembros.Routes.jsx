@@ -8,11 +8,12 @@ import Configuracion from "../pages/miembros/Configuracion";
 function recepcion() {
   return (
     <Routes>
-        <Route index path="/dashboard" element={<Dashboard />} />
-        <Route path="/progreso" element={<Progresos />} />
-        <Route path="/rutinas" element={<Rutinas />} />
-        <Route path="/alimentacion" element={<Alimentacion />} />
-        <Route path="/configuracion" element={<Configuracion />} />
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="progreso" element={<Progresos />} />
+        <Route path="rutinas" element={<Rutinas />} />
+        <Route path="alimentacion" element={<Alimentacion />} />
+        <Route path="configuracion" element={<Configuracion />} />
     </Routes>
   )
 }

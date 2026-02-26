@@ -8,111 +8,49 @@ const Asistencias = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFecha, setFilterFecha] = useState('hoy');
 
-  // Datos de ejemplo de asistencias
-  const [asistencias, setAsistencias] = useState([
-    {
-      id: 1,
-      memberId: '001',
-      nombre: 'Juan Pérez',
-      fecha: '2024-01-02',
-      horaEntrada: '08:30',
-      horaSalida: null,
-      avatar: 'J'
-    },
-    {
-      id: 2,
-      memberId: '045',
-      nombre: 'María García',
-      fecha: '2024-01-02',
-      horaEntrada: '09:15',
-      horaSalida: '11:30',
-      avatar: 'M'
-    },
-    {
-      id: 3,
-      memberId: '123',
-      nombre: 'Carlos López',
-      fecha: '2024-01-02',
-      horaEntrada: '10:00',
-      horaSalida: '12:15',
-      avatar: 'C'
-    },
-    {
-      id: 4,
-      memberId: '089',
-      nombre: 'Ana Martínez',
-      fecha: '2024-01-02',
-      horaEntrada: '10:45',
-      horaSalida: null,
-      avatar: 'A'
-    },
-    {
-      id: 5,
-      memberId: '067',
-      nombre: 'Pedro Sánchez',
-      fecha: '2024-01-01',
-      horaEntrada: '07:30',
-      horaSalida: '09:45',
-      avatar: 'P'
-    },
-    {
-      id: 6,
-      memberId: '034',
-      nombre: 'Laura Torres',
-      fecha: '2024-01-01',
-      horaEntrada: '08:00',
-      horaSalida: '10:30',
-      avatar: 'L'
-    }
-  ]);
+  const [asistencias, setAsistencias] = useState([]);
 
   const handleRegistrarAsistencia = async (e) => {
     e.preventDefault();
-    
     if (!memberId.trim()) {
       setMensaje('Por favor ingresa un ID válido');
       return;
     }
-
     setIsLoading(true);
-    
-    // Simulación de registro (aquí iría tu llamada al backend)
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ memberId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'error registrando');
+      setMensaje('¡Asistencia registrada exitosamente!');
+      setMemberId('');
+      await cargarAsistencias();
+    } catch (err) {
+      setMensaje(err.message);
+    } finally {
       setIsLoading(false);
-      
-      // Simulación: buscar miembro y registrar asistencia
-      const miembrosEjemplo = {
-        '001': 'Juan Pérez',
-        '045': 'María García',
-        '123': 'Carlos López',
-        '089': 'Ana Martínez',
-        '067': 'Pedro Sánchez',
-        '034': 'Laura Torres'
-      };
-
-      if (miembrosEjemplo[memberId]) {
-        const nuevaAsistencia = {
-          id: asistencias.length + 1,
-          memberId: memberId,
-          nombre: miembrosEjemplo[memberId],
-          fecha: new Date().toISOString().split('T')[0],
-          horaEntrada: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-          horaSalida: null,
-          avatar: miembrosEjemplo[memberId].charAt(0)
-        };
-
-        setAsistencias([nuevaAsistencia, ...asistencias]);
-        setMensaje('¡Asistencia registrada exitosamente!');
-        setMemberId('');
-      } else {
-        setMensaje('ID de miembro no encontrado');
-      }
-
-      setTimeout(() => {
-        setMensaje('');
-      }, 3000);
-    }, 1000);
+      setTimeout(() => setMensaje(''), 3000);
+    }
   };
+
+  const cargarAsistencias = async () => {
+    try {
+      const res = await fetch('/api/attendance');
+      const data = await res.json();
+      if (res.ok) {
+        setAsistencias(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  React.useEffect(() => {
+    cargarAsistencias();
+  }, []);
 
   // Filtrar asistencias
   const asistenciasFiltradas = asistencias.filter((asistencia) => {

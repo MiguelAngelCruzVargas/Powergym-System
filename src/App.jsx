@@ -3,16 +3,41 @@ import RutasPublicas from "./routes/Web.Routes";
 import Recepcionista from "./routes/Recepcion.Routes";
 import CoachRoutes from "./routes/Coach.Routes";
 import MiembrosRoutes from "./routes/Miembros.Routes";
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/*" element={<RutasPublicas />} />
-        <Route path="/recepcion/*" element={<Recepcionista />} />
-        <Route path="/coach/*" element={<CoachRoutes />} />
-        <Route path="/cliente/*" element={<MiembrosRoutes />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/*" element={<RutasPublicas />} />
+          <Route
+            path="/recepcion/*"
+            element={
+              <ProtectedRoute roles={["recepcionista","admin"]}>
+                <Recepcionista />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/coach/*"
+            element={
+              <ProtectedRoute roles={["coach","admin"]}>
+                <CoachRoutes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cliente/*"
+            element={
+              <ProtectedRoute roles={["miembro","admin"]}>
+                <MiembrosRoutes />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

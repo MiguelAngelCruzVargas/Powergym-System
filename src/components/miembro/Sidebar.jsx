@@ -1,12 +1,30 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
 
 const ClienteSidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useContext(AuthContext);
 
   const menuItems = [
+    // admin puede regresar a recepción desde cualquier panel
+    ...(user && user.role === 'admin'
+      ? [
+          {
+            id: 'admin-panel',
+            name: 'Volver a Recepción',
+            path: '/recepcion/dashboard',
+            icon: (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            )
+          }
+        ]
+      : []),
+
     {
       id: 'dashboard',
       name: 'Dashboard',
@@ -46,7 +64,7 @@ const ClienteSidebar = ({ isOpen, setIsOpen }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
       )
-    },
+    }
   ];
 
   const handleLogout = () => {

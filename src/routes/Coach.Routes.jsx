@@ -8,11 +8,12 @@ import Configuracion from "../pages/coach/Configuraciones";
 function recepcion() {
   return (
     <Routes>
-        <Route index path="/dashboard" element={<Dashboard />} />
-        <Route path="/clientes" element={<Clientes />} />
-        <Route path="/progreso" element={<Progresos />} />
-        <Route path="/rutinas" element={<Rutinas />} />
-        <Route path="/configuracion" element={<Configuracion />} />
+        <Route index element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="clientes" element={<Clientes />} />
+        <Route path="progreso" element={<Progresos />} />
+        <Route path="rutinas" element={<Rutinas />} />
+        <Route path="configuracion" element={<Configuracion />} />
     </Routes>
   )
 }

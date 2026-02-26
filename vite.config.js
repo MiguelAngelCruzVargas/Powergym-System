@@ -10,5 +10,12 @@ export default defineConfig({
   ],
   server: {
     host: true,
+    proxy: {
+      // forward /api requests to the Express backend during development
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
   }
 })
