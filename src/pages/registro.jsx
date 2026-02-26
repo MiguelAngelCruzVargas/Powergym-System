@@ -115,44 +115,46 @@ const Registro = () => {
   return (
     <div className={
         inPanel
-          ? "w-full h-full flex items-center justify-center py-12"
+          ? "w-full h-full flex items-start justify-center py-8"
           : "min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4 py-12"
       }>
-      {/* Logo flotante en la esquina superior izquierda */}
-      <motion.div
-        initial={{ x: -50, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="absolute top-6 left-6 flex items-center space-x-3 cursor-pointer"
-        onClick={() => navigate('/')}
-      >
-        <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-2 rounded-lg">
-          <svg 
-            className="w-8 h-8 text-white" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M13 10V3L4 14h7v7l9-11h-7z" 
-            />
-          </svg>
-        </div>
-        <span className="text-white font-bold text-xl hidden sm:block">
-          PowerGym
-        </span>
-      </motion.div>
+      {/* Logo flotante en la esquina superior izquierda (oculto dentro del panel) */}
+      {!inPanel && (
+        <motion.div
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="absolute top-6 left-6 flex items-center space-x-3 cursor-pointer"
+          onClick={() => navigate('/')}
+        >
+          <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-2 rounded-lg">
+            <svg 
+              className="w-8 h-8 text-white" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M13 10V3L4 14h7v7l9-11h-7z" 
+              />
+            </svg>
+          </div>
+          <span className="text-white font-bold text-xl hidden sm:block">
+            PowerGym
+          </span>
+        </motion.div>
+      )}
 
       {/* Contenido Principal */}
-      <div className={inPanel ? "flex items-center justify-center w-full h-full" : "flex items-center justify-center min-h-screen px-4 py-12"}>
+      <div className={inPanel ? "flex items-start justify-center w-full h-full px-6" : "flex items-center justify-center min-h-screen px-4 py-12"}>
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className={inPanel ? "w-full" : "w-full max-w-2xl"}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className={inPanel ? "w-full max-w-4xl mx-auto" : "w-full max-w-2xl"}
         >
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 shadow-2xl">
             {/* Encabezado */}
